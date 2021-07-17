@@ -6,36 +6,30 @@
 //
 
 import SwiftUI
+import SwiftUIX
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.created, ascending: true)])
     private var items: FetchedResults<Item>
-    @State private var isEditing = false
-    @State private var text: String = ""
+    
+    @State private var itemJustAdded = false
+    @State private var highlightIndex = -1
+    
+    @State private var user = "Ho"
+    @State private var foc = true
+//    @FocusedValueKey
     
     var body: some View {
         NavigationView {
             List {
                 ForEach(items) { item in
-                    TextField(
-                        "Todo Task",
-                        text: Binding<String>(get: {item.text ?? "<none>"}, set: {item.text = $0})
-//                        text: $text
-//                        ) { isEditing in
-//                            self.isEditing = isEditing
-//                        } onCommit: {
-//                            updateTodoItem(item, text)
-//                        }
-//                        .autocapitalization(.none)
-                    
-//                    Text(item.text ?? "Untitled")
-//                        .onTapGesture(count:1, perform: {
-//                            updateTodoItem(item)
-//                        }
-                    )
+                    CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
+                        .isFirstResponder(items.firstIndex{ $0 == item } == highlightIndex)
+                        .disableAutocorrection(true)
                 }.onDelete(perform: deleteTodoItems)
+                
             }
             .navigationTitle("Todo List")
             .navigationBarItems(trailing: Button("Add Task") {
@@ -54,9 +48,10 @@ struct ContentView: View {
     }
     
     private func addTodoItem() {
+        self.highlightIndex = self.items.count
         withAnimation{
             let newTodoItem = Item(context: viewContext)
-            newTodoItem.text = "New Task \(Date())"
+            newTodoItem.text = ""
             newTodoItem.created = Date()
             
             saveContext()
@@ -71,6 +66,7 @@ struct ContentView: View {
     }
     
     private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
+        self.highlightIndex = self.items.firstIndex{ $0 == item } ?? -1
         withAnimation {
             item.text = text
             saveContext()
