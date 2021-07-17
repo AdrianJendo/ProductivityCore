@@ -14,7 +14,7 @@ struct ProductivityCoreApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TodoListsView()
                 .environment(\.managedObjectContext, persistanceContainer.container.viewContext)
         }
     }

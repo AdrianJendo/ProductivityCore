@@ -8,18 +8,12 @@
 import SwiftUI
 import SwiftUIX
 
-struct ContentView: View {
+struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    
+    @State private var highlightIndex = -1    
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.created, ascending: true)])
     private var items: FetchedResults<Item>
-    
-    @State private var itemJustAdded = false
-    @State private var highlightIndex = -1
-    
-    @State private var user = "Ho"
-    @State private var foc = true
-//    @FocusedValueKey
+
     
     var body: some View {
         NavigationView {
@@ -74,8 +68,8 @@ struct ContentView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct TodoListView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        TodoListView()
     }
 }

@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A807EDB26A33DAA002805E7 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A807EDA26A33DAA002805E7 /* TodoListView.swift */; };
 		3A8DF27126A29E4600BC4226 /* SwiftUIX in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8DF27026A29E4600BC4226 /* SwiftUIX */; };
 		3A9AFF1F26A1332E00F11398 /* ProductivityCoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF1E26A1332E00F11398 /* ProductivityCoreApp.swift */; };
-		3A9AFF2126A1332E00F11398 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF2026A1332E00F11398 /* ContentView.swift */; };
+		3A9AFF2126A1332E00F11398 /* TodoListsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF2026A1332E00F11398 /* TodoListsView.swift */; };
 		3A9AFF2326A1332F00F11398 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A9AFF2226A1332F00F11398 /* Assets.xcassets */; };
 		3A9AFF2626A1332F00F11398 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A9AFF2526A1332F00F11398 /* Preview Assets.xcassets */; };
 		3A9AFF3026A1336A00F11398 /* TodoList.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF2E26A1336A00F11398 /* TodoList.xcdatamodeld */; };
@@ -17,9 +18,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3A807EDA26A33DAA002805E7 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
 		3A9AFF1B26A1332E00F11398 /* ProductivityCore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProductivityCore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A9AFF1E26A1332E00F11398 /* ProductivityCoreApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductivityCoreApp.swift; sourceTree = "<group>"; };
-		3A9AFF2026A1332E00F11398 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3A9AFF2026A1332E00F11398 /* TodoListsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListsView.swift; sourceTree = "<group>"; };
 		3A9AFF2226A1332F00F11398 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3A9AFF2526A1332F00F11398 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3A9AFF2726A1332F00F11398 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -39,6 +41,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A807ED826A33D83002805E7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3A9AFF2026A1332E00F11398 /* TodoListsView.swift */,
+				3A807EDA26A33DAA002805E7 /* TodoListView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		3A9AFF1226A1332E00F11398 = {
 			isa = PBXGroup;
 			children = (
@@ -59,7 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				3A9AFF1E26A1332E00F11398 /* ProductivityCoreApp.swift */,
-				3A9AFF2026A1332E00F11398 /* ContentView.swift */,
+				3A807ED826A33D83002805E7 /* Views */,
 				3A9AFF2E26A1336A00F11398 /* TodoList.xcdatamodeld */,
 				3A9AFF2226A1332F00F11398 /* Assets.xcassets */,
 				3A9AFF2726A1332F00F11398 /* Info.plist */,
@@ -152,10 +163,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3A9AFF2126A1332E00F11398 /* ContentView.swift in Sources */,
+				3A9AFF2126A1332E00F11398 /* TodoListsView.swift in Sources */,
 				3A9AFF3326A1346200F11398 /* Persistence.swift in Sources */,
 				3A9AFF1F26A1332E00F11398 /* ProductivityCoreApp.swift in Sources */,
 				3A9AFF3026A1336A00F11398 /* TodoList.xcdatamodeld in Sources */,
+				3A807EDB26A33DAA002805E7 /* TodoListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
