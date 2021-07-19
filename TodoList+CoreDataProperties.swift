@@ -33,7 +33,7 @@ extension TodoList {
     public var itemsArray: [Item] {
         let set = item as? Set<Item> ?? []
         return set.sorted {
-            $0.wrappedCreated < $1.wrappedCreated
+            $0.order < $1.order
         }
     }
 

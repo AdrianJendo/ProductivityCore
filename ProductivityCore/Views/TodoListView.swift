@@ -36,8 +36,8 @@ struct TodoListView: View {
     }
 
     private func addTodoItem() {
-        self.highlightIndex = self.list.itemsArray.count
         withAnimation{
+            self.highlightIndex = self.list.itemsArray.count
             let newTodoItem = Item(context: viewContext)
             newTodoItem.text = ""
             newTodoItem.created = Date()
@@ -50,7 +50,12 @@ struct TodoListView: View {
     private func deleteTodoItems(offsets: IndexSet) {
         withAnimation{
             for index in offsets {
-                let item = self.list.itemsArray[index]
+                let itemsArray = self.list.itemsArray
+                let item = itemsArray[index]
+                // Decrement the subsequent orders so that we can sort use the order property to determine item order
+                for i in (index+1) ..< itemsArray.count {
+                    itemsArray[i].order -= 1
+                }
                 PersistenceController.shared.delete(item)
             }
         }

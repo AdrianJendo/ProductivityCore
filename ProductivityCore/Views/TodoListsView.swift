@@ -10,7 +10,7 @@ import SwiftUIX
 
 struct TodoListsView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(entity: TodoList.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \TodoList.created, ascending: true)])
+    @FetchRequest(entity: TodoList.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \TodoList.order, ascending: true)])
     private var todoLists: FetchedResults<TodoList>
     
     var body: some View {
@@ -53,6 +53,10 @@ struct TodoListsView: View {
         withAnimation{
             for index in offsets {
                 let todoList = todoLists[index]
+                // Decrement the subsequent orders so that we can sort use the order property to determine item order
+                for i in (index+1) ..< todoLists.count {
+                    todoLists[i].order -= 1
+                }
                 PersistenceController.shared.delete(todoList)
             }
         }
