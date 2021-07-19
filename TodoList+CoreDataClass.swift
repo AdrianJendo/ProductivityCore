@@ -1,0 +1,15 @@
+//
+//  TodoList+CoreDataClass.swift
+//  ProductivityCore
+//
+//  Created by Adrian Jendo on 2021-07-18.
+//
+//
+
+import Foundation
+import CoreData
+
+@objc(TodoList)
+public class TodoList: NSManagedObject {
+
+}

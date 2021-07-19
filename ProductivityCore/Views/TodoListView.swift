@@ -10,26 +10,29 @@ import SwiftUIX
 
 struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var highlightIndex = -1    
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.created, ascending: true)])
-    private var items: FetchedResults<Item>
-
+//    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.created, ascending: true)])
+//    private var items: FetchedResults<Item>
+    
+    @ObservedObject var list: TodoList
+//    @State private var itemsArray: [Item]
+    @State private var highlightIndex = -1
     
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
-                        .isFirstResponder(items.firstIndex{ $0 == item } == highlightIndex)
-                        .disableAutocorrection(true)
-                }.onDelete(perform: deleteTodoItems)
-                
+        //if let items = self.list.item?.allObjects as? [Item] {
+//        let itemsArray = list.itemsArray
+//        highlightIndex = itemsArray[itemsArray.count-1].text == "" ? itemsArray.count-1 : -1
+        List {
+            ForEach(list.itemsArray) { item in
+                CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
+                    .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
+                    .disableAutocorrection(true)
             }
-            .navigationTitle("Todo List")
-            .navigationBarItems(trailing: Button("Add Task") {
-                addTodoItem()
-            })
-        }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
+            .onDelete(perform: deleteTodoItems)
+        }
+        .navigationTitle("Todo List")
+        .navigationBarItems(trailing: Button("Add Task") {
+            addTodoItem()
+        })
     }
     
     private func saveContext() {
@@ -42,11 +45,13 @@ struct TodoListView: View {
     }
     
     private func addTodoItem() {
-        self.highlightIndex = self.items.count
+        self.highlightIndex = self.list.itemsArray.count
         withAnimation{
             let newTodoItem = Item(context: viewContext)
             newTodoItem.text = ""
             newTodoItem.created = Date()
+            newTodoItem.order = Int64(self.list.itemsArray.count)
+            newTodoItem.origin = self.list
             
             saveContext()
         }
@@ -54,22 +59,27 @@ struct TodoListView: View {
     
     private func deleteTodoItems(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+            offsets.map { self.list.itemsArray[$0] }.forEach(viewContext.delete)
+//            for item in self.list.itemsArray {
+//                item.order -= 1
+//            }
             saveContext()
         }
     }
     
     private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
-        self.highlightIndex = self.items.firstIndex{ $0 == item } ?? -1
+//        if let items = self.list.item?.allObjects as? [Item] {
+        self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
         withAnimation {
             item.text = text
             saveContext()
         }
+//        }
     }
 }
 
-struct TodoListView_Previews: PreviewProvider {
-    static var previews: some View {
-        TodoListView()
-    }
-}
+//struct TodoListView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        TodoListView()
+//    }
+//}
