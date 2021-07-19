@@ -34,15 +34,6 @@ struct TodoListsView: View {
         }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
     }
     
-    private func saveContext() {
-        do{
-            try viewContext.save()
-        } catch {
-            let error = error as NSError
-            fatalError("Unresolved Error: \(error)")
-        }
-    }
-    
     func addTodoList() {
         withAnimation{
             let newTodoList = TodoList(context: viewContext)
@@ -54,14 +45,16 @@ struct TodoListsView: View {
             firstItem.text = ""
             firstItem.created = Date()
             firstItem.origin = newTodoList
-            saveContext()
+            PersistenceController.shared.save()
         }
     }
     
     private func deleteTodoList(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { todoLists[$0] }.forEach(viewContext.delete)
-            saveContext()
+        withAnimation{
+            for index in offsets {
+                let todoList = todoLists[index]
+                PersistenceController.shared.delete(todoList)
+            }
         }
     }
 }

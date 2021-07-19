@@ -34,16 +34,7 @@ struct TodoListView: View {
             addTodoItem()
         })
     }
-    
-    private func saveContext() {
-        do{
-            try viewContext.save()
-        } catch {
-            let error = error as NSError
-            fatalError("Unresolved Error: \(error)")
-        }
-    }
-    
+
     private func addTodoItem() {
         self.highlightIndex = self.list.itemsArray.count
         withAnimation{
@@ -52,18 +43,16 @@ struct TodoListView: View {
             newTodoItem.created = Date()
             newTodoItem.order = Int64(self.list.itemsArray.count)
             newTodoItem.origin = self.list
-            
-            saveContext()
+            PersistenceController.shared.save()
         }
     }
     
     private func deleteTodoItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { self.list.itemsArray[$0] }.forEach(viewContext.delete)
-//            for item in self.list.itemsArray {
-//                item.order -= 1
-//            }
-            saveContext()
+        withAnimation{
+            for index in offsets {
+                let item = self.list.itemsArray[index]
+                PersistenceController.shared.delete(item)
+            }
         }
     }
     
@@ -72,7 +61,7 @@ struct TodoListView: View {
         self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
         withAnimation {
             item.text = text
-            saveContext()
+            PersistenceController.shared.save()
         }
 //        }
     }
