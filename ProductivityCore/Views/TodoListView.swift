@@ -12,7 +12,7 @@ struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @ObservedObject var list: TodoList
     @State private var highlightIndex = -1
-    @State private var mode: EditMode = .inactive
+    @State private var editMode: EditMode = .inactive
 
     var body: some View {
         List {
@@ -23,13 +23,12 @@ struct TodoListView: View {
             }
             .onDelete(perform: deleteTodoItems)
         }
-        .navigationTitle("Todo List")
-
+        .navigationBarTitle(list.wrappedTitle)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                if(mode == .transient) {
+                if(editMode == .transient) {
                     Button("Cancel") {
-                        mode = .inactive
+                        editMode = .inactive
                     }
                 }
                 else {
@@ -41,10 +40,10 @@ struct TodoListView: View {
                 }) {
                     Image(systemName: "plus.circle")
                 }
-                .disabled(mode == .active || mode == .transient)
+                .disabled(editMode == .active || editMode == .transient)
             }
         }
-        .environment(\.editMode, $mode)
+        .environment(\.editMode, $editMode)
     }
 
     private func addTodoItem() {
