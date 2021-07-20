@@ -10,17 +10,11 @@ import SwiftUIX
 
 struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-//    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \Item.created, ascending: true)])
-//    private var items: FetchedResults<Item>
-    
     @ObservedObject var list: TodoList
-//    @State private var itemsArray: [Item]
     @State private var highlightIndex = -1
-    
+    @State private var mode: EditMode = .inactive
+
     var body: some View {
-        //if let items = self.list.item?.allObjects as? [Item] {
-//        let itemsArray = list.itemsArray
-//        highlightIndex = itemsArray[itemsArray.count-1].text == "" ? itemsArray.count-1 : -1
         List {
             ForEach(list.itemsArray) { item in
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
@@ -30,9 +24,27 @@ struct TodoListView: View {
             .onDelete(perform: deleteTodoItems)
         }
         .navigationTitle("Todo List")
-        .navigationBarItems(trailing: Button("Add Task") {
-            addTodoItem()
-        })
+
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                if(mode == .transient) {
+                    Button("Cancel") {
+                        mode = .inactive
+                    }
+                }
+                else {
+                    EditButton()
+                }
+
+                Button(action: {
+                    addTodoItem()
+                }) {
+                    Image(systemName: "plus.circle")
+                }
+                .disabled(mode == .active || mode == .transient)
+            }
+        }
+        .environment(\.editMode, $mode)
     }
 
     private func addTodoItem() {
@@ -71,6 +83,7 @@ struct TodoListView: View {
 //        }
     }
 }
+
 
 //struct TodoListView_Previews: PreviewProvider {
 //    static var previews: some View {
