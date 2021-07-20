@@ -45,6 +45,7 @@ struct TodoListsView: View {
             firstItem.text = ""
             firstItem.created = Date()
             firstItem.origin = newTodoList
+            firstItem.order = 0
             PersistenceController.shared.save()
         }
     }

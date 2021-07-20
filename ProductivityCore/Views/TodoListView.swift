@@ -20,8 +20,10 @@ struct TodoListView: View {
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
                     .disableAutocorrection(true)
+                    .disabled(editMode == .active || editMode == .transient)
             }
             .onDelete(perform: deleteTodoItems)
+            .onMove(perform: moveTodoItem)
         }
         .navigationBarTitle(list.wrappedTitle)
         .toolbar {
@@ -71,7 +73,7 @@ struct TodoListView: View {
             }
         }
     }
-    
+
     private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
 //        if let items = self.list.item?.allObjects as? [Item] {
         self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
@@ -80,6 +82,25 @@ struct TodoListView: View {
             PersistenceController.shared.save()
         }
 //        }
+    }
+
+    private func moveTodoItem(source: IndexSet, destination: Int) {
+        var itemsArray = self.list.itemsArray
+        itemsArray.move(fromOffsets: source, toOffset: destination)
+        self.highlightIndex = source.first! < destination ? destination - 1 : destination
+
+        for index in itemsArray.indices {
+            itemsArray[index].order = Int64(index)
+        }
+
+        PersistenceController.shared.save()
+    }
+
+    private func checkOrder(_ arr: [Item]) {
+        for i in arr {
+            print(i.order)
+        }
+        print("----------")
     }
 }
 
