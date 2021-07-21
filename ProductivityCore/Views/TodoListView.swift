@@ -10,9 +10,9 @@ import SwiftUIX
 
 struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject var list: TodoList
-    @State private var highlightIndex = -1
-    @State private var editMode: EditMode = .inactive
+    @ObservedObject var list: TodoList // List item passed in from TodoListsView
+    @State private var highlightIndex = -1 // Highlighted index when updating a field
+    @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
 
     var body: some View {
         List {
@@ -46,8 +46,10 @@ struct TodoListView: View {
             }
         }
         .environment(\.editMode, $editMode)
+        .onAppear(perform: setHighlightIndex)
     }
 
+    // Add new item
     private func addTodoItem() {
         withAnimation{
             self.highlightIndex = self.list.itemsArray.count
@@ -59,7 +61,8 @@ struct TodoListView: View {
             PersistenceController.shared.save()
         }
     }
-    
+
+    // Delete item
     private func deleteTodoItems(offsets: IndexSet) {
         withAnimation{
             for index in offsets {
@@ -74,6 +77,7 @@ struct TodoListView: View {
         }
     }
 
+    // Change text of item
     private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
 //        if let items = self.list.item?.allObjects as? [Item] {
         self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
@@ -84,6 +88,7 @@ struct TodoListView: View {
 //        }
     }
 
+    // Change order
     private func moveTodoItem(source: IndexSet, destination: Int) {
         var itemsArray = self.list.itemsArray
         itemsArray.move(fromOffsets: source, toOffset: destination)
@@ -96,6 +101,19 @@ struct TodoListView: View {
         PersistenceController.shared.save()
     }
 
+    // Sets the value of highlight index on view load
+    private func setHighlightIndex() {
+//        let itemsArray = self.list.itemsArray
+//        print(itemsArray)
+//        print(itemsArray.count)
+//        if(itemsArray[itemsArray.count-1].text == ""){
+//            print(self.highlightIndex)
+//            self.highlightIndex = itemsArray.count-1
+//        }
+        print("Hello")
+    }
+
+    // Helper function just to make sure the order doesn't get messed up (not used in prod)
     private func checkOrder(_ arr: [Item]) {
         for i in arr {
             print(i.order)

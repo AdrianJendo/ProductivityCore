@@ -30,6 +30,7 @@ struct PersistenceController {
         }
     }
 
+    // Save the core data into memory
     func save(completion: @escaping (Error?) -> () = {_ in}) {
         let context = container.viewContext
         if context.hasChanges {
@@ -42,6 +43,7 @@ struct PersistenceController {
         }
     }
 
+    // Delete an item from core data memory
     func delete(_ object: NSManagedObject, completion: @escaping (Error?) -> () = {_ in}) {
         let context = container.viewContext
         context.delete(object)
