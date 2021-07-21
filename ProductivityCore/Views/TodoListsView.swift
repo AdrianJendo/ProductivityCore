@@ -45,6 +45,10 @@ struct TodoListsView: View {
                     .disabled(editMode == .active || editMode == .transient)
                 }
             }
+            .overlay(Text("Add A New Todo List")
+                .font(.system(size: 32, weight: .thin))
+                .opacity(todoLists.count > 0 ? 0 : 1)
+            )
             .environment(\.editMode, $editMode)
         }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
     }

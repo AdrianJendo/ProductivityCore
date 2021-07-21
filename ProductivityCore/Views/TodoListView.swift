@@ -26,9 +26,26 @@ struct TodoListView: View {
             .onMove(perform: moveTodoItem)
         }
         .navigationBarTitle(list.wrappedTitle)
+//        .navigationBarLargeTitleItems(trailing: Image(systemName:"plus.circle"))
+        .overlay(Text("Add A New Item")
+                    .font(.system(size: 32, weight: .thin))
+                    .opacity(list.itemsArray.count > 0 ? 0 : 1)
+        )
+//        .navigationBarTitle("")
+//        .navigationBarTitleDisplayMode(.inline)
+//        .navigationBarItems(leading:
+//            Text("Fuck")
+//                                .padding()
+//                                                    .background(Color.green)
+//        )
+//        .toolbar {
+//            ToolbarItem(placement: .principal) {
+//                Text("Title")
+//            }
+//        }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                if(editMode == .transient) {
+                if editMode == .transient {
                     Button("Cancel") {
                         editMode = .inactive
                     }
@@ -47,6 +64,10 @@ struct TodoListView: View {
         }
         .environment(\.editMode, $editMode)
         .onAppear(perform: setHighlightIndex)
+    }
+    
+    private func bruh() {
+        print("Hello world")
     }
 
     // Add new item
@@ -102,15 +123,14 @@ struct TodoListView: View {
     }
 
     // Sets the value of highlight index on view load
+    // Currently sets index to last empty index, but considering just changing to to last index if its empty
     private func setHighlightIndex() {
-//        let itemsArray = self.list.itemsArray
-//        print(itemsArray)
-//        print(itemsArray.count)
-//        if(itemsArray[itemsArray.count-1].text == ""){
-//            print(self.highlightIndex)
-//            self.highlightIndex = itemsArray.count-1
-//        }
-        print("Hello")
+        let itemsArray = self.list.itemsArray
+        if let lastEmptyIndex = itemsArray.lastIndex(where: { $0.text == ""}) {
+            DispatchQueue.main.async {
+                self.highlightIndex = lastEmptyIndex
+            }
+        }
     }
 
     // Helper function just to make sure the order doesn't get messed up (not used in prod)
