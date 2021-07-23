@@ -13,9 +13,35 @@ struct TodoListView: View {
     @ObservedObject var list: TodoList // List item passed in from TodoListsView
     @State private var highlightIndex = -1 // Highlighted index when updating a field
     @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
+    @State private var showNavBarTitle = false // true when we should show the top navbar
 
     var body: some View {
         List {
+            VStack (spacing:0) {
+                GeometryReader { reader -> AnyView in
+                    let yAxis = reader.frame(in: .global).maxY
+                    if yAxis < 90 && !showNavBarTitle ||  yAxis > 90 && showNavBarTitle {
+                        withAnimation{ showNavBarTitle.toggle() }
+                    }
+
+                    return AnyView (
+                        HStack {
+                            Text(list.wrappedTitle)
+                                .font(.system(size: 35, weight:.bold))
+                            if editMode == .active {
+                                Button(action: {}) {
+                                    Image(systemName: "square.and.pencil")
+                                        .foregroundColor(.systemBlue)
+                                        .font(.system(size: 25, weight: .bold))
+                                        .padding(.top, 2)
+                                }
+                            }
+                            Spacer()
+                        }
+                    )
+                    
+                }
+            }
             ForEach(list.itemsArray) { item in
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
@@ -25,24 +51,14 @@ struct TodoListView: View {
             .onDelete(perform: deleteTodoItems)
             .onMove(perform: moveTodoItem)
         }
-        .navigationBarTitle(list.wrappedTitle)
-//        .navigationBarLargeTitleItems(trailing: Image(systemName:"plus.circle"))
-        .overlay(Text("Add A New Item")
-                    .font(.system(size: 32, weight: .thin))
-                    .opacity(list.itemsArray.count > 0 ? 0 : 1)
-        )
-//        .navigationBarTitle("")
-//        .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarItems(leading:
-//            Text("Fuck")
-//                                .padding()
-//                                                    .background(Color.green)
-//        )
-//        .toolbar {
-//            ToolbarItem(placement: .principal) {
-//                Text("Title")
-//            }
-//        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: ToolbarItemPlacement.principal) {
+                Text(list.wrappedTitle)
+                    .font(Font.headline.weight(.semibold))
+                    .opacity(showNavBarTitle ? 1 : 0)
+            }
+        }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 if editMode == .transient {
@@ -64,10 +80,11 @@ struct TodoListView: View {
         }
         .environment(\.editMode, $editMode)
         .onAppear(perform: setHighlightIndex)
-    }
-    
-    private func bruh() {
-        print("Hello world")
+        .overlay(
+            Text("Add A New Item")
+                .font(.system(size: 32, weight: .thin))
+                .opacity(list.itemsArray.count > 0 ? 0 : 1)
+        )
     }
 
     // Add new item
