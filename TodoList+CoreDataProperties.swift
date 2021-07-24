@@ -17,7 +17,7 @@ extension TodoList {
     }
 
     @NSManaged public var created: Date?
-    @NSManaged public var id: UUID?
+    @NSManaged public var id: UUID
     @NSManaged public var order: Int64
     @NSManaged public var title: String?
     @NSManaged public var item: NSSet?
