@@ -15,13 +15,14 @@ struct TodoListsView: View {
     @State private var highlightIndex = -1 // Highlighted index when updating a field
     @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
     @State private var popupTitle = "" // Binding for when editing todolist title
-    @State private var popupType: PopupTypes = .cancel //Status of popup
-    @State private var showPopup = false //Booean needed to check on change of previous variable
+    @State private var popupType: PopupTypes = .cancel // Status of popup
+    @State private var showPopup = false // Boolean needed to check on change of previous variable
+    
 
     var body: some View {
         ZStack {
             NavigationView {
-                List{
+                List {
                     ForEach(todoLists) { list in
                         NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
                     }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUIX
 
 struct TodoListView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -14,18 +13,21 @@ struct TodoListView: View {
     @State private var highlightIndex = -1 // Highlighted index when updating a field
     @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
     @State private var popupTitle = "" // Binding for when editing todolist title
-    @State private var popupType: PopupTypes = .cancel //Status of popup
-    @State private var showPopup = false //Booean needed to check on change of previous variable
-
+    @State private var popupType: PopupTypes = .cancel // Status of popup
+    @State private var showPopup = false // Boolean needed to check on change of previous variable
+    @State private var showCompleted = false // Boolean for showing completed todos
+    @State private var showOnlyCompleted = false // Boolean for showing only the completed tasks
+    @State private var numCompleted = 0 // Number of completed todo items
+    @State private var deleteCompletedPopup = false // Boolean for checking if deleteCompleted todos popup should be open
+    
     var body: some View {
         ZStack{
             VStack {
-                List {
+                List() {
                     ForEach(list.itemsArray) { item in
-                        CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
-                            .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
-                            .disableAutocorrection(true)
-                            .disabled(editMode == .active || editMode == .transient)
+                        if !item.completed || showCompleted {
+                            TodoListRowView(list: list, item: item, completed: item.completed, numCompleted:$numCompleted, showCompleted:$showCompleted, editMode: $editMode, highlightIndex: $highlightIndex)
+                        }
                     }
                     .onDelete(perform: deleteTodoItems)
                     .onMove(perform: moveTodoItem)
@@ -62,7 +64,9 @@ struct TodoListView: View {
                                     popupType = .done
                                     showPopup = false
                                 }
-                                editMode.toggle()
+                                withAnimation {
+                                    editMode.toggle()
+                                }
                             }
                         }
                         
@@ -76,7 +80,7 @@ struct TodoListView: View {
                 }
                 .navigationBarTitleDisplayMode(.inline)
                 .environment(\.editMode, $editMode)
-                .onAppear(perform: setHighlightIndex)
+                .onAppear(perform: initializeList)
                 .overlay(
                     Text("Add A New Item")
                         .font(.system(size: 32, weight: .thin))
@@ -92,8 +96,36 @@ struct TodoListView: View {
                     }
                 }
                 .navigationBarBackButtonHidden(showPopup)
-                Button(action: {print("Pressed")}) {
-                    Text("Show Completed")
+                Divider()
+                VStack (spacing: 10) {
+                    if showCompleted {
+                        HStack {
+                            Button(action: {
+                                print("DELETE")
+                            }) {
+                                Text("\(Image(systemName: "trash"))")
+                            }
+                            .disabled(numCompleted == 0)
+                            .frame(maxWidth: .infinity)
+                            Divider()
+                                .frame(height: 20)
+                            Button(action: {
+                                showOnlyCompleted.toggle()
+                            }) {
+                                Text("\(showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding(0)
+                        Divider()
+                            .padding(0)
+                    }
+                    Button(action: {
+                        showCompleted.toggle()
+                    }) {
+                        Text("\(showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
+                    }
+                    .padding(.top, 10)
                 }
             }
             Popup(title: "Change List Title", placeholder: "New List Name", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
@@ -129,17 +161,6 @@ struct TodoListView: View {
         }
     }
 
-    // Change text of item
-    private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
-//        if let items = self.list.item?.allObjects as? [Item] {
-        self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
-        withAnimation {
-            item.text = text
-            PersistenceController.shared.save()
-        }
-//        }
-    }
-
     // Change order
     private func moveTodoItem(source: IndexSet, destination: Int) {
         var itemsArray = self.list.itemsArray
@@ -155,9 +176,14 @@ struct TodoListView: View {
 
     // Sets the value of highlight index on view load
     // Currently sets index to last empty index, but considering just changing to to last index if its empty
-    private func setHighlightIndex() {
+    private func initializeList() {
         self.popupTitle = self.list.wrappedTitle
         let itemsArray = self.list.itemsArray
+        for item in itemsArray {
+            if item.completed {
+                self.numCompleted += 1
+            }
+        }
         if let lastEmptyIndex = itemsArray.lastIndex(where: { $0.text == ""}) {
             DispatchQueue.main.async {
                 self.highlightIndex = lastEmptyIndex
@@ -181,10 +207,3 @@ extension String {
         return size.width
     }
 }
-
-
-//struct TodoListView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        TodoListView()
-//    }
-//}

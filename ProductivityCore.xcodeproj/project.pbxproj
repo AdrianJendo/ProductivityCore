@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3A411D8526ACB50100F2111E /* Popup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A411D8426ACB50100F2111E /* Popup.swift */; };
+		3A68F9D626ADF96600BCF61C /* TodoListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A68F9D526ADF96600BCF61C /* TodoListRowView.swift */; };
 		3A807EDB26A33DAA002805E7 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A807EDA26A33DAA002805E7 /* TodoListView.swift */; };
 		3A8DF27126A29E4600BC4226 /* SwiftUIX in Frameworks */ = {isa = PBXBuildFile; productRef = 3A8DF27026A29E4600BC4226 /* SwiftUIX */; };
 		3A9AFF1F26A1332E00F11398 /* ProductivityCoreApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF1E26A1332E00F11398 /* ProductivityCoreApp.swift */; };
@@ -24,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		3A411D8426ACB50100F2111E /* Popup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Popup.swift; sourceTree = "<group>"; };
+		3A68F9D526ADF96600BCF61C /* TodoListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListRowView.swift; sourceTree = "<group>"; };
 		3A807EDA26A33DAA002805E7 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
 		3A807EDF26A343B2002805E7 /* todo.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = todo.md; sourceTree = "<group>"; };
 		3A9AFF1B26A1332E00F11398 /* ProductivityCore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProductivityCore.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,6 +60,7 @@
 				3A9AFF2026A1332E00F11398 /* TodoListsView.swift */,
 				3A807EDA26A33DAA002805E7 /* TodoListView.swift */,
 				3A411D8426ACB50100F2111E /* Popup.swift */,
+				3A68F9D526ADF96600BCF61C /* TodoListRowView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 				3ADCCFAC26A3A4CA00983EF4 /* TodoList+CoreDataProperties.swift in Sources */,
 				3A411D8526ACB50100F2111E /* Popup.swift in Sources */,
 				3A9AFF2126A1332E00F11398 /* TodoListsView.swift in Sources */,
+				3A68F9D626ADF96600BCF61C /* TodoListRowView.swift in Sources */,
 				3A9CFA6C26A4FD7900B984B0 /* Item+CoreDataClass.swift in Sources */,
 				3A9AFF3326A1346200F11398 /* Persistence.swift in Sources */,
 				3A9AFF1F26A1332E00F11398 /* ProductivityCoreApp.swift in Sources */,
