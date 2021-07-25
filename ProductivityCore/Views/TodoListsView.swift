@@ -14,50 +14,67 @@ struct TodoListsView: View {
     private var todoLists: FetchedResults<TodoList>
     @State private var highlightIndex = -1 // Highlighted index when updating a field
     @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
+    @State private var popupTitle = "" // Binding for when editing todolist title
+    @State private var popupType: PopupTypes = .cancel //Status of popup
+    @State private var showPopup = false //Booean needed to check on change of previous variable
 
     var body: some View {
-        NavigationView {
-            List{
-                ForEach(todoLists) { list in
-                    NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
+        ZStack {
+            NavigationView {
+                List{
+                    ForEach(todoLists) { list in
+                        NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
+                    }
+                    .onDelete(perform: deleteTodoList)
+                    .onMove(perform: moveTodoList)
                 }
-                .onDelete(perform: deleteTodoList)
-                .onMove(perform: moveTodoList)
-            }
-//            .id(UUID())
-            .navigationTitle("Todo Lists")
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    if(editMode == .transient) {
-                        Button("Cancel") {
-                            editMode = .inactive
+    //            .id(UUID())
+                .navigationTitle("Todo Lists")
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        if(editMode == .transient) {
+                            Button("Cancel") {
+                                editMode = .inactive
+                            }
                         }
-                    }
-                    else {
-                        EditButton()
-                    }
+                        else {
+                            EditButton()
+                        }
 
-                    Button(action: {
-                        addTodoList()
-                    }) {
-                        Image(systemName: "plus.circle")
+                        Button(action: {
+                            popupType = .open
+                            showPopup = true
+                        }) {
+                            Image(systemName: "plus.circle")
+                        }
+                        .disabled(editMode == .active || editMode == .transient)
                     }
-                    .disabled(editMode == .active || editMode == .transient)
                 }
-            }
-            .overlay(Text("Add A New Todo List")
-                .font(.system(size: 32, weight: .thin))
-                .opacity(todoLists.count > 0 ? 0 : 1)
-            )
-            .environment(\.editMode, $editMode)
-        }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
+                .overlay(Text("Add A New Todo List")
+                    .font(.system(size: 32, weight: .thin))
+                    .opacity(todoLists.count > 0 ? 0 : 1)
+                )
+                .environment(\.editMode, $editMode)
+                .onChange(of: showPopup, perform: { value in
+                    if popupType == .done {
+                        if(popupTitle == ""){
+                            popupTitle = "New Item"
+                        }
+                        addTodoList(popupTitle)
+                    }
+                    
+                    popupTitle = ""
+                })
+            }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
+            Popup(title: "Add a New Todo List", placeholder: "New Todo List", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
+        }
     }
 
     // Add a new todo item
-    func addTodoList() {
+    func addTodoList(_ title: String) {
         withAnimation{
             let newTodoList = TodoList(context: viewContext)
-            newTodoList.title = "New Item"
+            newTodoList.title = title
             newTodoList.created = Date()
             newTodoList.id = UUID()
             newTodoList.order = Int64(todoLists.count)

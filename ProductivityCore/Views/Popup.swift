@@ -10,31 +10,27 @@ import SwiftUIX
 
 struct Popup: View {
     var title: String
-    var name: String
-    @Binding var show: PopupTypes
-    @State var text = ""
+    var placeholder: String
+    @Binding var show: Bool
+    @Binding var popupStatus: PopupTypes
+    @Binding var text: String
     
     var body: some View {
         ZStack {
-            if show == .open {
+            if show {
                 // PopUp background color
-                Color.black.opacity(show == .open ? 0.3 : 0).edgesIgnoringSafeArea(.all)
+                Color.black.opacity(show ? 0.3 : 0).edgesIgnoringSafeArea(.all)
 
                 // PopUp Window
-                VStack(alignment: .center, spacing: 0) {
+                VStack(spacing: 0) {
                     Text(title)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .font(Font.system(size: 16, weight: .semibold))
                     .padding()
                     
                     Divider()
-                    
-//                    CocoaTextField("New List Name", text: $textFieldTitle, isEditing: .constant(true))
-//                        .isFirstResponder(true)
-//                        .padding(EdgeInsets(top: 20, leading: 25, bottom: 20, trailing: 25))
-//                        .background(Color.systemBackground)
-//                        .selectAll(nil)
-                    FirstResponderTextField(text: $text, placeholder: "New List Name")
+
+                    FirstResponderTextField(text: $text, placeholder: placeholder)
                         .padding(EdgeInsets(top: 20, leading: 25, bottom: 20, trailing: 25))
                         .background(Color.systemBackground)
                     
@@ -45,7 +41,8 @@ struct Popup: View {
                         Button(action: {
                             // Dismiss the PopUp
                             withAnimation(.linear(duration: 0.3)) {
-                                show = .cancel
+                                show = false
+                                popupStatus = .cancel
                             }
                         }, label: {
                             Text("Cancel")
@@ -57,7 +54,8 @@ struct Popup: View {
                         Button(action: {
                             // Dismiss the PopUp
                             withAnimation(.linear(duration: 0.3)) {
-                                show = .done
+                                show = false
+                                popupStatus = .done
                             }
                         }, label: {
                             Text("Done")
@@ -69,11 +67,8 @@ struct Popup: View {
                     
                 }
                 .background(Color.secondarySystemBackground)
-                .cornerRadius(25)
-                .frame(maxWidth: 300, maxHeight: 100, alignment: .topLeading)
-                .onAppear(perform: {
-                    text = name
-                })
+                .cornerRadius(10)
+                .frame(maxWidth: 300, maxHeight: 100)
             }
         }
     }

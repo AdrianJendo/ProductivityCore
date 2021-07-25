@@ -20,23 +20,6 @@ struct ProductivityCoreApp: App {
     }
 }
 
-private struct PopupKey: EnvironmentKey {
-    static let defaultValue: PopupTypes = .cancel
-}
-
-extension EnvironmentValues {
-    var popupTypes: PopupTypes {
-        get { self[PopupKey.self] }
-        set { self[PopupKey.self] = newValue }
-    }
-}
-
-extension View {
-    func popupTypes(_ popupTypes: PopupTypes) -> some View {
-        environment(\.popupTypes, popupTypes)
-    }
-}
-
 enum PopupTypes {
     case open
     case done
@@ -70,6 +53,7 @@ struct FirstResponderTextField: UIViewRepresentable {
         let textField = UITextField()
         textField.delegate = context.coordinator
         textField.placeholder = placeholder
+        textField.text = text
         return textField
     }
     

@@ -20,6 +20,7 @@ extension Item {
     @NSManaged public var order: Int64
     @NSManaged public var text: String?
     @NSManaged public var origin: TodoList?
+    @NSManaged public var completed: Bool
     
     public var wrappedText: String {
         text ?? ""
