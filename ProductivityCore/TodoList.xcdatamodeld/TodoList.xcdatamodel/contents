@@ -11,11 +11,13 @@
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="order" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="showCompleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="showOnlyCompleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="title" optional="YES" attributeType="String"/>
         <relationship name="item" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="origin" inverseEntity="Item"/>
     </entity>
     <elements>
         <element name="Item" positionX="-63" positionY="-18" width="128" height="104"/>
-        <element name="TodoList" positionX="-63" positionY="-27" width="128" height="104"/>
+        <element name="TodoList" positionX="-63" positionY="-27" width="128" height="134"/>
     </elements>
 </model>

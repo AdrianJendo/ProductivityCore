@@ -78,6 +78,8 @@ struct TodoListsView: View {
             newTodoList.title = title
             newTodoList.created = Date()
             newTodoList.id = UUID()
+            newTodoList.showCompleted = false
+            newTodoList.showOnlyCompleted = false
             newTodoList.order = Int64(todoLists.count)
             let firstItem = Item(context: viewContext)
             firstItem.text = ""

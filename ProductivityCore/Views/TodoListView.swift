@@ -25,7 +25,10 @@ struct TodoListView: View {
             VStack {
                 List() {
                     ForEach(list.itemsArray) { item in
-                        if !item.completed || showCompleted {
+                        if (showCompleted && !showOnlyCompleted) || //Try simplify with boolean algebra at some point
+                            (showCompleted && showOnlyCompleted && item.completed) ||
+                            (!showCompleted && !item.completed)
+                        {
                             TodoListRowView(list: list, item: item, completed: item.completed, numCompleted:$numCompleted, showCompleted:$showCompleted, editMode: $editMode, highlightIndex: $highlightIndex)
                         }
                     }
@@ -94,6 +97,15 @@ struct TodoListView: View {
                     else {
                         popupTitle = self.list.wrappedTitle
                     }
+                }
+                .onChange(of: showCompleted) { value in
+                    self.list.showCompleted = value
+                    print(value)
+                    PersistenceController.shared.save()
+                }
+                .onChange(of: showOnlyCompleted) { value in
+                    self.list.showOnlyCompleted = value
+                    PersistenceController.shared.save()
                 }
                 .navigationBarBackButtonHidden(showPopup)
                 Divider()
@@ -178,6 +190,8 @@ struct TodoListView: View {
     // Currently sets index to last empty index, but considering just changing to to last index if its empty
     private func initializeList() {
         self.popupTitle = self.list.wrappedTitle
+        self.showCompleted = self.list.showCompleted
+        self.showOnlyCompleted = self.list.showOnlyCompleted
         let itemsArray = self.list.itemsArray
         for item in itemsArray {
             if item.completed {

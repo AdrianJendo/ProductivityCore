@@ -20,6 +20,8 @@ extension TodoList {
     @NSManaged public var id: UUID
     @NSManaged public var order: Int64
     @NSManaged public var title: String?
+    @NSManaged public var showCompleted: Bool
+    @NSManaged public var showOnlyCompleted: Bool
     @NSManaged public var item: NSSet?
     
     public var wrappedTitle: String {

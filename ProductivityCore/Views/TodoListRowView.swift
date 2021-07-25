@@ -16,29 +16,44 @@ struct TodoListRowView: View {
     @Binding var showCompleted: Bool
     @Binding var editMode: EditMode
     @Binding var highlightIndex: Int
+    @State private var animationDone = false
     
     
     var body: some View {
         HStack {
-            if showCompleted || !completed {
-                Circle()
-                    .stroke(Color.orange, lineWidth: 2)
-                    .background(Circle().fill(completed ? Color.orange : Color.systemBackground))
-                    .frame(width: 20, height: 20)
-                    .padding(.trailing, 5)
-                    .onTapGesture {
+            if !animationDone || showCompleted || !completed {
+                ZStack {
+                    Circle()
+                        .stroke(Color.orange, lineWidth: 2)
+//                        .background(Circle().fill(completed ? Color.orange : Color.systemBackground))
+                        .frame(width: 20, height: 20)
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 15, height: 15)
+                        .opacity(completed ? 1 : 0)
+                        .animation(Animation.easeInOut)
+                }
+                .padding(.trailing, 5)
+                .onTapGesture {
+                    
+                    completed.toggle()
+                    animationDone = false
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
+                            animationDone = true
                             if completed {
-                                numCompleted -= 1
-                            }
-                            else {
                                 numCompleted += 1
                             }
-                            completed.toggle()
+                            else {
+                                numCompleted -= 1
+                            }
                             item.completed.toggle()
                             PersistenceController.shared.save()
                         }
                     }
+                    
+                }
                 
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
