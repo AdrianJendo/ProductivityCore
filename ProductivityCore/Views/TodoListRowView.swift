@@ -55,7 +55,7 @@ struct TodoListRowView: View {
                     
                 }
                 
-                CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? "<none>"}, set: {updateTodoItem(item, $0)}))
+                CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? ""}, set: {updateTodoItem(item, $0)}))
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
                     .disableAutocorrection(true)
                     .disabled(editMode == .active || editMode == .transient)

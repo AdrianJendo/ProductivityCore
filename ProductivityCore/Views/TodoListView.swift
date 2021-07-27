@@ -19,6 +19,7 @@ struct TodoListView: View {
     @State private var showOnlyCompleted = false // Boolean for showing only the completed tasks
     @State private var numCompleted = 0 // Number of completed todo items
     @State private var deleteCompletedPopup = false // Boolean for checking if deleteCompleted todos popup should be open
+    @State private var addButtonDelay = false // Boolean used to disable add button between item additions
     
     var body: some View {
         ZStack{
@@ -78,7 +79,7 @@ struct TodoListView: View {
                         }) {
                             Image(systemName: "plus.circle")
                         }
-                        .disabled(editMode == .active || editMode == .transient)
+                        .disabled(editMode == .active || editMode == .transient || addButtonDelay)
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
@@ -100,7 +101,6 @@ struct TodoListView: View {
                 }
                 .onChange(of: showCompleted) { value in
                     self.list.showCompleted = value
-                    print(value)
                     PersistenceController.shared.save()
                 }
                 .onChange(of: showOnlyCompleted) { value in
@@ -113,9 +113,9 @@ struct TodoListView: View {
                     if showCompleted {
                         HStack {
                             Button(action: {
-                                print("DELETE")
+                                removeCompleted()
                             }) {
-                                Text("\(Image(systemName: "trash"))")
+                                Text("\(Image(systemName: "xmark.bin"))")
                             }
                             .disabled(numCompleted == 0)
                             .frame(maxWidth: .infinity)
@@ -147,6 +147,7 @@ struct TodoListView: View {
     // Add new item
     private func addTodoItem() {
         withAnimation{
+            addButtonDelay = true
             self.highlightIndex = self.list.itemsArray.count
             let newTodoItem = Item(context: viewContext)
             newTodoItem.text = ""
@@ -155,6 +156,9 @@ struct TodoListView: View {
             newTodoItem.origin = self.list
             newTodoItem.completed = false
             PersistenceController.shared.save()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Delay prevents spamming items which could cause unwanted consequences
+                addButtonDelay = false
+            }
         }
     }
 
@@ -204,14 +208,29 @@ struct TodoListView: View {
             }
         }
     }
+    
+    private func removeCompleted() {
+        let filtered = self.list.itemsArray.filter({ $0.completed })
+        
+        withAnimation {
+            let itemsArray = self.list.itemsArray
+            for item in filtered {
+                let index = itemsArray.firstIndex(of: item) ?? itemsArray.count
+                for i in (index+1) ..< itemsArray.count {
+                    itemsArray[i].order -= 1
+                }
+                PersistenceController.shared.delete(item)
+            }
+        }
+    }
 
     // Helper function just to make sure the order doesn't get messed up (not used in prod)
-    private func checkOrder(_ arr: [Item]) {
-        for i in arr {
-            print(i.order)
-        }
-        print("----------")
-    }
+//    private func checkOrder(_ arr: [Item]) {
+//        for i in arr {
+//            print(i.order)
+//        }
+//        print("----------")
+//    }
 }
 
 extension String {
