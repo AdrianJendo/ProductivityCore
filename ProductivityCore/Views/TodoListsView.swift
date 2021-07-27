@@ -23,7 +23,7 @@ struct TodoListsView: View {
         ZStack {
             NavigationView {
                 List {
-                    ForEach(todoLists) { list in
+                    ForEach(todoLists, id:\.self) { list in
                         NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
                     }
                     .onDelete(perform: deleteTodoList)

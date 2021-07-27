@@ -25,7 +25,7 @@ struct TodoListView: View {
         ZStack{
             VStack {
                 List() {
-                    ForEach(list.itemsArray) { item in
+                    ForEach(list.itemsArray, id:\.self) { item in
                         if (showCompleted && !showOnlyCompleted) || //Try simplify with boolean algebra at some point
                             (showCompleted && showOnlyCompleted && item.completed) ||
                             (!showCompleted && !item.completed)
@@ -127,6 +127,14 @@ struct TodoListView: View {
                                 Text("\(showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
                             }
                             .frame(maxWidth: .infinity)
+                            Divider()
+                                .frame(height: 20)
+                            Button(action: {
+                                resetToIncomplete()
+                            }) {
+                                Image(systemName: "arrow.clockwise")
+                            }
+                            .frame(maxWidth: .infinity)
                         }
                         .padding(0)
                         Divider()
@@ -146,6 +154,7 @@ struct TodoListView: View {
 
     // Add new item
     private func addTodoItem() {
+        checkOrder(self.list.itemsArray)
         withAnimation{
             addButtonDelay = true
             self.highlightIndex = self.list.itemsArray.count
@@ -223,14 +232,25 @@ struct TodoListView: View {
             }
         }
     }
+    
+    private func resetToIncomplete() {
+        withAnimation {
+            for item in self.list.itemsArray {
+                item.completed = false
+            }
+            PersistenceController.shared.save()
+        }
+    }
 
     // Helper function just to make sure the order doesn't get messed up (not used in prod)
-//    private func checkOrder(_ arr: [Item]) {
-//        for i in arr {
-//            print(i.order)
-//        }
-//        print("----------")
-//    }
+    private func checkOrder(_ arr: [Item]) {
+        var cur = 0
+        for item in arr {
+            assert(item.order == cur, "ORDER INCORRECT")
+            cur += 1
+        }
+        print("Check Completed Successfully")
+    }
 }
 
 extension String {
