@@ -20,11 +20,12 @@ struct TodoListView: View {
     @State private var numCompleted = 0 // Number of completed todo items
     @State private var deleteCompletedPopup = false // Boolean for checking if deleteCompleted todos popup should be open
     @State private var addButtonDelay = false // Boolean used to disable add button between item additions
+    @State private var showCompletedFooter = false // Boolean for showing other features like show only completed, refresh completed, and delete completed
     
     var body: some View {
         ZStack{
             VStack {
-                List() {
+                List {
                     ForEach(list.itemsArray, id:\.self) { item in
                         if (showCompleted && !showOnlyCompleted) || //Try simplify with boolean algebra at some point
                             (showCompleted && showOnlyCompleted && item.completed) ||
@@ -107,45 +108,69 @@ struct TodoListView: View {
                     self.list.showOnlyCompleted = value
                     PersistenceController.shared.save()
                 }
+                .onChange(of: showCompletedFooter) { value in
+                    self.list.showCompletedFooter = value
+                    PersistenceController.shared.save()
+                }
                 .navigationBarBackButtonHidden(showPopup)
                 Divider()
-                VStack (spacing: 10) {
-                    if showCompleted {
-                        HStack {
-                            Button(action: {
-                                removeCompleted()
-                            }) {
-                                Text("\(Image(systemName: "xmark.bin"))")
+                if numCompleted > 0 {
+                    VStack (spacing: 10) {
+                        if showCompletedFooter && showCompleted {
+                            HStack {
+                                Button(action: {
+                                    removeCompleted()
+                                }) {
+                                    Text("\(Image(systemName: "xmark.bin"))")
+                                }
+                                .frame(maxWidth: .infinity)
+                                Divider()
+                                    .frame(height: 20)
+                                Button(action: {
+                                    withAnimation {
+                                        showOnlyCompleted.toggle()
+                                    }
+                                }) {
+                                    Text("\(showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
+                                }
+                                .frame(maxWidth: .infinity)
+                                Divider()
+                                    .frame(height: 20)
+                                Button(action: {
+                                    resetToIncomplete()
+                                }) {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                .frame(maxWidth: .infinity)
                             }
-                            .disabled(numCompleted == 0)
-                            .frame(maxWidth: .infinity)
-                            Divider()
-                                .frame(height: 20)
-                            Button(action: {
-                                showOnlyCompleted.toggle()
-                            }) {
-                                Text("\(showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
-                            }
-                            .frame(maxWidth: .infinity)
-                            Divider()
-                                .frame(height: 20)
-                            Button(action: {
-                                resetToIncomplete()
-                            }) {
-                                Image(systemName: "arrow.clockwise")
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                        .padding(0)
-                        Divider()
                             .padding(0)
+                            Divider()
+                                .padding(0)
+                        }
+                        ZStack {
+                            Button(action: {
+                                withAnimation {
+                                    showCompleted.toggle()
+                                }
+                            }) {
+                                Text("\(showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
+                            }
+                            .padding(.top, 10)
+                            if showCompleted {
+                                Button(action: {
+                                    withAnimation {
+                                        showCompletedFooter.toggle()
+                                    }
+                                }) {
+                                    Image(systemName: "arrow.up")
+                                }
+                                .rotationEffect(Angle.degrees(showCompletedFooter ? 180 : 0))
+                                .animation(Animation.easeInOut)
+                                .offset(x: 160)
+                                .padding(.top, 10)
+                            }
+                        }
                     }
-                    Button(action: {
-                        showCompleted.toggle()
-                    }) {
-                        Text("\(showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
-                    }
-                    .padding(.top, 10)
                 }
             }
             Popup(title: "Change List Title", placeholder: "New List Name", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
@@ -154,7 +179,7 @@ struct TodoListView: View {
 
     // Add new item
     private func addTodoItem() {
-        checkOrder(self.list.itemsArray)
+//        checkOrder(self.list.itemsArray)
         withAnimation{
             addButtonDelay = true
             self.highlightIndex = self.list.itemsArray.count
@@ -181,6 +206,12 @@ struct TodoListView: View {
                 for i in (index+1) ..< itemsArray.count {
                     itemsArray[i].order -= 1
                 }
+                if item.completed {
+                    self.numCompleted -= 1
+                    if numCompleted == 0 {
+                        self.showOnlyCompleted = false
+                    }
+                }
                 PersistenceController.shared.delete(item)
             }
         }
@@ -205,6 +236,7 @@ struct TodoListView: View {
         self.popupTitle = self.list.wrappedTitle
         self.showCompleted = self.list.showCompleted
         self.showOnlyCompleted = self.list.showOnlyCompleted
+        self.showCompletedFooter = self.list.showCompletedFooter
         let itemsArray = self.list.itemsArray
         for item in itemsArray {
             if item.completed {
@@ -224,21 +256,34 @@ struct TodoListView: View {
         withAnimation {
             let itemsArray = self.list.itemsArray
             for item in filtered {
-                let index = itemsArray.firstIndex(of: item) ?? itemsArray.count
-                for i in (index+1) ..< itemsArray.count {
-                    itemsArray[i].order -= 1
+                if let index = itemsArray.firstIndex(of: item){
+                    for i in (index+1) ..< itemsArray.count {
+                        itemsArray[i].order -= 1
+                    }
                 }
                 PersistenceController.shared.delete(item)
             }
+            self.numCompleted = 0
+            self.showOnlyCompleted = false
         }
     }
     
     private func resetToIncomplete() {
+        let filtered = self.list.itemsArray.filter({ $0.completed })
+
+        for item in filtered {
+            let replacementTodoItem = Item(context: viewContext)
+            replacementTodoItem.text = item.wrappedText
+            replacementTodoItem.created = item.created
+            replacementTodoItem.order = item.order
+            replacementTodoItem.origin = self.list
+            replacementTodoItem.completed = false
+            PersistenceController.shared.delete(item)
+        }
+        
         withAnimation {
-            for item in self.list.itemsArray {
-                item.completed = false
-            }
-            PersistenceController.shared.save()
+            self.numCompleted = 0
+            self.showOnlyCompleted = false
         }
     }
 

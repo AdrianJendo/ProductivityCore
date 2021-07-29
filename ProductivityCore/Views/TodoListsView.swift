@@ -29,7 +29,6 @@ struct TodoListsView: View {
                     .onDelete(perform: deleteTodoList)
                     .onMove(perform: moveTodoList)
                 }
-    //            .id(UUID())
                 .navigationTitle("Todo Lists")
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -80,6 +79,7 @@ struct TodoListsView: View {
             newTodoList.id = UUID()
             newTodoList.showCompleted = false
             newTodoList.showOnlyCompleted = false
+            newTodoList.showCompletedFooter = false
             newTodoList.order = Int64(todoLists.count)
             let firstItem = Item(context: viewContext)
             firstItem.text = ""
