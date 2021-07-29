@@ -35,10 +35,8 @@ struct TodoListRowView: View {
                 }
                 .padding(.trailing, 5)
                 .onTapGesture {
-                    
                     completed.toggle()
                     animationDone = false
-                    
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
                             animationDone = true
@@ -52,8 +50,8 @@ struct TodoListRowView: View {
                             PersistenceController.shared.save()
                         }
                     }
-                    
                 }
+                .disabled(editMode != .inactive)
                 
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? ""}, set: {updateTodoItem(item, $0)}))
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)

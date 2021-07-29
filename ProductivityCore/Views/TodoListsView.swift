@@ -73,19 +73,7 @@ struct TodoListsView: View {
     // Add a new todo item
     func addTodoList(_ title: String) {
         withAnimation{
-            let newTodoList = TodoList(context: viewContext)
-            newTodoList.title = title
-            newTodoList.created = Date()
-            newTodoList.id = UUID()
-            newTodoList.showCompleted = false
-            newTodoList.showOnlyCompleted = false
-            newTodoList.showCompletedFooter = false
-            newTodoList.order = Int64(todoLists.count)
-            let firstItem = Item(context: viewContext)
-            firstItem.text = ""
-            firstItem.created = Date()
-            firstItem.origin = newTodoList
-            firstItem.order = 0
+            _ = TodoList(context: viewContext, title: title, numLists: todoLists.count)
             PersistenceController.shared.save()
         }
     }

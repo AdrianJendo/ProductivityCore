@@ -25,6 +25,23 @@ extension TodoList {
     @NSManaged public var showCompletedFooter: Bool
     @NSManaged public var item: NSSet?
     
+    convenience init(context: NSManagedObjectContext, title: String, numLists: Int) {
+        self.init(context: context)
+        self.title = title
+        self.created = Date()
+        self.id = UUID()
+        self.showCompleted = false
+        self.showOnlyCompleted = false
+        self.showCompletedFooter = false
+        self.order = Int64(numLists)
+        
+        let firstItem = Item(context: context)
+        firstItem.text = ""
+        firstItem.created = Date()
+        firstItem.origin = self
+        firstItem.order = 0
+    }
+    
     public var wrappedTitle: String {
         title ?? "New List"
     }

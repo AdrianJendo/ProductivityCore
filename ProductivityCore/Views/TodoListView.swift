@@ -80,7 +80,7 @@ struct TodoListView: View {
                         }) {
                             Image(systemName: "plus.circle")
                         }
-                        .disabled(editMode == .active || editMode == .transient || addButtonDelay)
+                        .disabled(editMode != .inactive || addButtonDelay)
                     }
                 }
                 .navigationBarTitleDisplayMode(.inline)
@@ -183,12 +183,7 @@ struct TodoListView: View {
         withAnimation{
             addButtonDelay = true
             self.highlightIndex = self.list.itemsArray.count
-            let newTodoItem = Item(context: viewContext)
-            newTodoItem.text = ""
-            newTodoItem.created = Date()
-            newTodoItem.order = Int64(self.list.itemsArray.count)
-            newTodoItem.origin = self.list
-            newTodoItem.completed = false
+            _ = Item(context: viewContext, list: self.list)
             PersistenceController.shared.save()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // Delay prevents spamming items which could cause unwanted consequences
                 addButtonDelay = false
@@ -272,12 +267,7 @@ struct TodoListView: View {
         let filtered = self.list.itemsArray.filter({ $0.completed })
 
         for item in filtered {
-            let replacementTodoItem = Item(context: viewContext)
-            replacementTodoItem.text = item.wrappedText
-            replacementTodoItem.created = item.created
-            replacementTodoItem.order = item.order
-            replacementTodoItem.origin = self.list
-            replacementTodoItem.completed = false
+            _ = Item(context: viewContext, originalItem: item)
             PersistenceController.shared.delete(item)
         }
         
