@@ -25,7 +25,7 @@ struct TodoListView: View {
                 List {
                     ForEach(list.itemsArray, id:\.self) { item in
                         if (list.showCompleted && !list.showOnlyCompleted) || //Try simplify with boolean algebra at some point
-                            (list.showCompleted && list.showOnlyCompleted && item.completed) ||
+                            (list.showCompleted && item.completed) ||
                             (!list.showCompleted && !item.completed)
                         {
                             TodoListRowView(list: list, item: item, completed: item.completed, numCompleted:$numCompleted, showCompleted:$list.showCompleted, editMode: $editMode, highlightIndex: $highlightIndex)
@@ -255,10 +255,8 @@ struct TodoListView: View {
     private func resetToIncomplete() {
         let filtered = self.list.itemsArray.filter({ $0.completed })
 
-        withAnimation {
-            self.numCompleted = 0
-            self.list.showOnlyCompleted = false
-        }
+        self.numCompleted = 0
+        self.list.showOnlyCompleted = false
 
         for item in filtered {
             _ = Item(context: viewContext, originalItem: item)
