@@ -217,7 +217,8 @@ struct TodoListView: View {
     }
 
     // Sets the value of highlight index on view load
-    // Currently sets index to last empty index, but considering just changing to to last index if its empty
+    // Currently sets index to last empty index, but considering changing to just last index if its empty
+    // Also does necessary initializations
     private func initializeList() {
         self.popupTitle = self.list.wrappedTitle
         let itemsArray = self.list.itemsArray
