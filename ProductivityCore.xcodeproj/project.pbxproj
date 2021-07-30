@@ -19,6 +19,7 @@
 		3A9AFF3326A1346200F11398 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9AFF3226A1346200F11398 /* Persistence.swift */; };
 		3A9CFA6926A4FD5300B984B0 /* TodoList+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9CFA6826A4FD5300B984B0 /* TodoList+CoreDataClass.swift */; };
 		3A9CFA6C26A4FD7900B984B0 /* Item+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9CFA6B26A4FD7900B984B0 /* Item+CoreDataClass.swift */; };
+		3AC9A33926B382A300C9BA84 /* ConfirmPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC9A33826B382A300C9BA84 /* ConfirmPopup.swift */; };
 		3ADCCFAA26A3A4CA00983EF4 /* Item+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADCCFA626A3A4CA00983EF4 /* Item+CoreDataProperties.swift */; };
 		3ADCCFAC26A3A4CA00983EF4 /* TodoList+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADCCFA826A3A4CA00983EF4 /* TodoList+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
@@ -38,6 +39,7 @@
 		3A9AFF3226A1346200F11398 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		3A9CFA6826A4FD5300B984B0 /* TodoList+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodoList+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		3A9CFA6B26A4FD7900B984B0 /* Item+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		3AC9A33826B382A300C9BA84 /* ConfirmPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmPopup.swift; sourceTree = "<group>"; };
 		3ADCCFA626A3A4CA00983EF4 /* Item+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Item+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		3ADCCFA826A3A4CA00983EF4 /* TodoList+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TodoList+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -61,6 +63,7 @@
 				3A807EDA26A33DAA002805E7 /* TodoListView.swift */,
 				3A411D8426ACB50100F2111E /* Popup.swift */,
 				3A68F9D526ADF96600BCF61C /* TodoListRowView.swift */,
+				3AC9A33826B382A300C9BA84 /* ConfirmPopup.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -190,6 +193,7 @@
 				3A68F9D626ADF96600BCF61C /* TodoListRowView.swift in Sources */,
 				3A9CFA6C26A4FD7900B984B0 /* Item+CoreDataClass.swift in Sources */,
 				3A9AFF3326A1346200F11398 /* Persistence.swift in Sources */,
+				3AC9A33926B382A300C9BA84 /* ConfirmPopup.swift in Sources */,
 				3A9AFF1F26A1332E00F11398 /* ProductivityCoreApp.swift in Sources */,
 				3A9CFA6926A4FD5300B984B0 /* TodoList+CoreDataClass.swift in Sources */,
 				3A9AFF3026A1336A00F11398 /* TodoList.xcdatamodeld in Sources */,

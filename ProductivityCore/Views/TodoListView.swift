@@ -15,23 +15,20 @@ struct TodoListView: View {
     @State private var popupTitle = "" // Binding for when editing todolist title
     @State private var popupType: PopupTypes = .cancel // Status of popup
     @State private var showPopup = false // Boolean needed to check on change of previous variable
-    @State private var showCompleted = false // Boolean for showing completed todos
-    @State private var showOnlyCompleted = false // Boolean for showing only the completed tasks
     @State private var numCompleted = 0 // Number of completed todo items
-    @State private var deleteCompletedPopup = false // Boolean for checking if deleteCompleted todos popup should be open
     @State private var addButtonDelay = false // Boolean used to disable add button between item additions
-    @State private var showCompletedFooter = false // Boolean for showing other features like show only completed, refresh completed, and delete completed
+    @State private var deleteCompletedPopup = false // Boolean for checking if deleteCompleted todos popup should be open
     
     var body: some View {
         ZStack{
             VStack {
                 List {
                     ForEach(list.itemsArray, id:\.self) { item in
-                        if (showCompleted && !showOnlyCompleted) || //Try simplify with boolean algebra at some point
-                            (showCompleted && showOnlyCompleted && item.completed) ||
-                            (!showCompleted && !item.completed)
+                        if (list.showCompleted && !list.showOnlyCompleted) || //Try simplify with boolean algebra at some point
+                            (list.showCompleted && list.showOnlyCompleted && item.completed) ||
+                            (!list.showCompleted && !item.completed)
                         {
-                            TodoListRowView(list: list, item: item, completed: item.completed, numCompleted:$numCompleted, showCompleted:$showCompleted, editMode: $editMode, highlightIndex: $highlightIndex)
+                            TodoListRowView(list: list, item: item, completed: item.completed, numCompleted:$numCompleted, showCompleted:$list.showCompleted, editMode: $editMode, highlightIndex: $highlightIndex)
                         }
                     }
                     .onDelete(perform: deleteTodoItems)
@@ -100,26 +97,16 @@ struct TodoListView: View {
                         popupTitle = self.list.wrappedTitle
                     }
                 }
-                .onChange(of: showCompleted) { value in
-                    self.list.showCompleted = value
-                    PersistenceController.shared.save()
-                }
-                .onChange(of: showOnlyCompleted) { value in
-                    self.list.showOnlyCompleted = value
-                    PersistenceController.shared.save()
-                }
-                .onChange(of: showCompletedFooter) { value in
-                    self.list.showCompletedFooter = value
-                    PersistenceController.shared.save()
-                }
                 .navigationBarBackButtonHidden(showPopup)
                 Divider()
                 if numCompleted > 0 {
                     VStack (spacing: 10) {
-                        if showCompletedFooter && showCompleted {
+                        if list.showCompletedFooter && list.showCompleted {
                             HStack {
                                 Button(action: {
-                                    removeCompleted()
+                                    withAnimation {
+                                        deleteCompletedPopup = true
+                                    }
                                 }) {
                                     Text("\(Image(systemName: "xmark.bin"))")
                                 }
@@ -128,10 +115,11 @@ struct TodoListView: View {
                                     .frame(height: 20)
                                 Button(action: {
                                     withAnimation {
-                                        showOnlyCompleted.toggle()
+                                        list.showOnlyCompleted.toggle()
+                                        PersistenceController.shared.save()
                                     }
                                 }) {
-                                    Text("\(showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
+                                    Text("\(list.showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
                                 }
                                 .frame(maxWidth: .infinity)
                                 Divider()
@@ -150,21 +138,23 @@ struct TodoListView: View {
                         ZStack {
                             Button(action: {
                                 withAnimation {
-                                    showCompleted.toggle()
+                                    list.showCompleted.toggle()
+                                    PersistenceController.shared.save()
                                 }
                             }) {
-                                Text("\(showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
+                                Text("\(list.showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
                             }
                             .padding(.top, 10)
-                            if showCompleted {
+                            if list.showCompleted {
                                 Button(action: {
                                     withAnimation {
-                                        showCompletedFooter.toggle()
+                                        list.showCompletedFooter.toggle()
+                                        PersistenceController.shared.save()
                                     }
                                 }) {
                                     Image(systemName: "arrow.up")
                                 }
-                                .rotationEffect(Angle.degrees(showCompletedFooter ? 180 : 0))
+                                .rotationEffect(Angle.degrees(list.showCompletedFooter ? 180 : 0))
                                 .animation(Animation.easeInOut)
                                 .offset(x: 160)
                                 .padding(.top, 10)
@@ -174,6 +164,7 @@ struct TodoListView: View {
                 }
             }
             Popup(title: "Change List Title", placeholder: "New List Name", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
+            ConfirmPopup(title: "Delete Completed Items", text: "Are you sure you want to \n delete these items?", show: $deleteCompletedPopup, onConfirm: {self.removeCompleted()})
         }
     }
 
@@ -204,7 +195,7 @@ struct TodoListView: View {
                 if item.completed {
                     self.numCompleted -= 1
                     if numCompleted == 0 {
-                        self.showOnlyCompleted = false
+                        self.list.showOnlyCompleted = false
                     }
                 }
                 PersistenceController.shared.delete(item)
@@ -229,9 +220,6 @@ struct TodoListView: View {
     // Currently sets index to last empty index, but considering just changing to to last index if its empty
     private func initializeList() {
         self.popupTitle = self.list.wrappedTitle
-        self.showCompleted = self.list.showCompleted
-        self.showOnlyCompleted = self.list.showOnlyCompleted
-        self.showCompletedFooter = self.list.showCompletedFooter
         let itemsArray = self.list.itemsArray
         for item in itemsArray {
             if item.completed {
@@ -259,21 +247,21 @@ struct TodoListView: View {
                 PersistenceController.shared.delete(item)
             }
             self.numCompleted = 0
-            self.showOnlyCompleted = false
+            self.list.showOnlyCompleted = false
         }
     }
     
     private func resetToIncomplete() {
         let filtered = self.list.itemsArray.filter({ $0.completed })
 
+        withAnimation {
+            self.numCompleted = 0
+            self.list.showOnlyCompleted = false
+        }
+
         for item in filtered {
             _ = Item(context: viewContext, originalItem: item)
             PersistenceController.shared.delete(item)
-        }
-        
-        withAnimation {
-            self.numCompleted = 0
-            self.showOnlyCompleted = false
         }
     }
 
