@@ -26,6 +26,12 @@ enum PopupTypes {
     case cancel
 }
 
+enum ViewTypes {
+    case todos
+    case calendar
+    case reminders
+}
+
 struct FirstResponderTextField: UIViewRepresentable {
     
     @Binding var text: String

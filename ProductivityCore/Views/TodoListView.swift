@@ -98,70 +98,89 @@ struct TodoListView: View {
                     }
                 }
                 .navigationBarBackButtonHidden(showPopup)
-                Divider()
-                if numCompleted > 0 {
-                    VStack (spacing: 10) {
-                        if list.showCompletedFooter && list.showCompleted {
-                            HStack {
-                                Button(action: {
-                                    withAnimation {
-                                        deleteCompletedPopup = true
-                                    }
-                                }) {
-                                    Text("\(Image(systemName: "xmark.bin"))")
-                                }
-                                .frame(maxWidth: .infinity)
-                                Divider()
-                                    .frame(height: 20)
-                                Button(action: {
-                                    withAnimation {
-                                        list.showOnlyCompleted.toggle()
-                                        PersistenceController.shared.save()
-                                    }
-                                }) {
-                                    Text("\(list.showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
-                                }
-                                .frame(maxWidth: .infinity)
-                                Divider()
-                                    .frame(height: 20)
-                                Button(action: {
-                                    resetToIncomplete()
-                                }) {
-                                    Image(systemName: "arrow.clockwise")
-                                }
-                                .frame(maxWidth: .infinity)
-                            }
-                            .padding(0)
-                            Divider()
-                                .padding(0)
-                        }
-                        ZStack {
-                            Button(action: {
-                                withAnimation {
-                                    list.showCompleted.toggle()
-                                    PersistenceController.shared.save()
-                                }
-                            }) {
-                                Text("\(list.showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
-                            }
-                            .padding(.top, 10)
-                            if list.showCompleted {
-                                Button(action: {
-                                    withAnimation {
-                                        list.showCompletedFooter.toggle()
-                                        PersistenceController.shared.save()
-                                    }
-                                }) {
-                                    Image(systemName: "arrow.up")
-                                }
-                                .rotationEffect(Angle.degrees(list.showCompletedFooter ? 180 : 0))
-                                .animation(Animation.easeInOut)
-                                .offset(x: 160)
-                                .padding(.top, 10)
-                            }
-                        }
-                    }
-                }
+//                .toolbar {
+//                    ToolbarItemGroup(placement: .bottomBar) {
+//                        Spacer()
+//                        Button(action: {
+//                            print("Todo")
+//                        }) {
+//                            Image(systemName: "mic")
+//                        }
+//                        .disabled(true)
+//                        Spacer()
+//                        Button(action: {
+//                            print("Calendar")
+//                        }) {
+//                            Image(systemName: "message")
+//                        }
+//                        Spacer()
+//                    }
+//                }
+                
+//                Divider()
+//                if numCompleted > 0 && highlightIndex == -1 {
+//                    VStack (spacing: 10) {
+//                        if list.showCompletedFooter && list.showCompleted {
+//                            HStack {
+//                                Button(action: {
+//                                    withAnimation {
+//                                        deleteCompletedPopup = true
+//                                    }
+//                                }) {
+//                                    Text("\(Image(systemName: "xmark.bin"))")
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                                Divider()
+//                                    .frame(height: 20)
+//                                Button(action: {
+//                                    withAnimation {
+//                                        list.showOnlyCompleted.toggle()
+//                                        PersistenceController.shared.save()
+//                                    }
+//                                }) {
+//                                    Text("\(list.showOnlyCompleted ? "Hide" : "Show") Only \(Image(systemName: "list.bullet"))")
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                                Divider()
+//                                    .frame(height: 20)
+//                                Button(action: {
+//                                    resetToIncomplete()
+//                                }) {
+//                                    Image(systemName: "arrow.clockwise")
+//                                }
+//                                .frame(maxWidth: .infinity)
+//                            }
+//                            .padding(0)
+//                            Divider()
+//                                .padding(0)
+//                        }
+//                        ZStack {
+//                            Button(action: {
+//                                withAnimation {
+//                                    list.showCompleted.toggle()
+//                                    PersistenceController.shared.save()
+//                                }
+//                            }) {
+//                                Text("\(list.showCompleted ? "Hide" : "Show") Completed (\(numCompleted))")
+//                            }
+//                            .padding(.top, 10)
+//                            if list.showCompleted {
+//                                Button(action: {
+//                                    withAnimation {
+//                                        list.showCompletedFooter.toggle()
+//                                        PersistenceController.shared.save()
+//                                    }
+//                                }) {
+//                                    Image(systemName: "arrow.up")
+//                                }
+//                                .rotationEffect(Angle.degrees(list.showCompletedFooter ? 180 : 0))
+//                                .animation(Animation.easeInOut)
+//                                .offset(x: 160)
+//                                .padding(.top, 10)
+//                            }
+//                        }
+//                    }
+//                }
             }
             Popup(title: "Change List Title", placeholder: "New List Name", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
             ConfirmPopup(title: "Delete Completed Items", text: "Are you sure you want to \n delete these items?", show: $deleteCompletedPopup, onConfirm: {self.removeCompleted()})
@@ -170,7 +189,6 @@ struct TodoListView: View {
 
     // Add new item
     private func addTodoItem() {
-//        checkOrder(self.list.itemsArray)
         withAnimation{
             addButtonDelay = true
             self.highlightIndex = self.list.itemsArray.count
@@ -200,6 +218,7 @@ struct TodoListView: View {
                 }
                 PersistenceController.shared.delete(item)
             }
+            self.highlightIndex = -1
         }
     }
 
@@ -207,7 +226,8 @@ struct TodoListView: View {
     private func moveTodoItem(source: IndexSet, destination: Int) {
         var itemsArray = self.list.itemsArray
         itemsArray.move(fromOffsets: source, toOffset: destination)
-        self.highlightIndex = source.first! < destination ? destination - 1 : destination
+//        self.highlightIndex = source.first! < destination ? destination - 1 : destination
+        self.highlightIndex = -1
 
         for index in itemsArray.indices {
             itemsArray[index].order = Int64(index)
@@ -249,6 +269,7 @@ struct TodoListView: View {
             }
             self.numCompleted = 0
             self.list.showOnlyCompleted = false
+            self.highlightIndex = -1
         }
     }
     
@@ -257,6 +278,8 @@ struct TodoListView: View {
 
         self.numCompleted = 0
         self.list.showOnlyCompleted = false
+        self.highlightIndex = -1
+        
 
         for item in filtered {
             _ = Item(context: viewContext, originalItem: item)

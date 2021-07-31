@@ -17,6 +17,7 @@ struct TodoListRowView: View {
     @Binding var editMode: EditMode
     @Binding var highlightIndex: Int
     @State private var animationDone = false
+    @State private var isEditing = false
     
     
     var body: some View {
@@ -53,7 +54,9 @@ struct TodoListRowView: View {
                 }
                 .disabled(editMode != .inactive)
                 
-                CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? ""}, set: {updateTodoItem(item, $0)}))
+                CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? ""}, set: {updateTodoItem(item, $0)}), onCommit: {
+                    highlightIndex = -1
+                 })
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
                     .disableAutocorrection(true)
                     .disabled(editMode == .active || editMode == .transient)
