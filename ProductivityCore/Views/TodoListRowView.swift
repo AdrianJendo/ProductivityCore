@@ -25,12 +25,12 @@ struct TodoListRowView: View {
             if !animationDone || showCompleted || !completed {
                 ZStack {
                     Circle()
-                        .stroke(Color.orange, lineWidth: 2)
+                        .stroke(completed ? Color.orange : Color(UIColor.lightGray), lineWidth: 1.5)
 //                        .background(Circle().fill(completed ? Color.orange : Color.systemBackground))
-                        .frame(width: 20, height: 20)
+                        .frame(width: 25, height: 25)
                     Circle()
                         .fill(Color.orange)
-                        .frame(width: 15, height: 15)
+                        .frame(width: 20, height: 20)
                         .opacity(completed ? 1 : 0)
                         .animation(Animation.easeInOut)
                 }
@@ -58,6 +58,7 @@ struct TodoListRowView: View {
                     highlightIndex = -1
                  })
                     .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
+                    .height(40)
                     .disableAutocorrection(true)
                     .disabled(editMode == .active || editMode == .transient)
             }

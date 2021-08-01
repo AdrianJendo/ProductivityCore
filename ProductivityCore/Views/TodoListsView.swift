@@ -21,36 +21,16 @@ struct TodoListsView: View {
 
     var body: some View {
         ZStack {
-            VStack{
                 NavigationView {
                     List {
                         ForEach(todoLists, id:\.self) { list in
                             NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
+                                .height(40)
                         }
                         .onDelete(perform: deleteTodoList)
                         .onMove(perform: moveTodoList)
                     }
                     .navigationTitle("Todo Lists")
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            if(editMode == .transient) {
-                                Button("Cancel") {
-                                    editMode = .inactive
-                                }
-                            }
-                            else {
-                                EditButton()
-                            }
-                            
-                            Button(action: {
-                                popupType = .open
-                                showPopup = true
-                            }) {
-                                Image(systemName: "plus.circle")
-                            }
-                            .disabled(editMode == .active || editMode == .transient)
-                        }
-                    }
                     .overlay(Text("Add A New Todo List")
                                 .font(.system(size: 32, weight: .thin))
                                 .opacity(todoLists.count > 0 ? 0 : 1)
@@ -66,32 +46,40 @@ struct TodoListsView: View {
                         
                         popupTitle = ""
                     })
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigationBarTrailing) {
+                            if(editMode == .transient) {
+                                Button("Cancel") {
+                                    editMode = .inactive
+                                }
+                            }
+                            else {
+                                Button(action: {
+                                    withAnimation {
+                                        editMode.toggle()
+                                    }
+                                }) {
+                                    Text(editMode == .active ? "Done" : "Edit")
+                                }
+                            }
+                            
+                            Button(action: {
+                                popupType = .open
+                                showPopup = true
+                            }) {
+                                Image(systemName: "plus.circle")
+                            }
+                            .disabled(editMode == .active || editMode == .transient)
+                        }
+                        
+                        ToolbarItem(placement: .bottomBar) {
+                            Text("")
+                                .height(55)
+                                .width(500)
+                                .backgroundFill(Color.systemBackground)
+                        }
+                    }
                 }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
-            }
-//            .toolbar {
-//                ToolbarItemGroup(placement: .bottomBar) {
-//                    Spacer()
-//                    Button(action: {
-//                        print("Todo")
-//                    }) {
-//                        Image(systemName: "list.bullet")
-//                    }
-//                    .disabled(true)
-//                    Spacer()
-//                    Button(action: {
-//                        print("Calendar")
-//                    }) {
-//                        Image(systemName: "calendar")
-//                    }
-//                    Spacer()
-//                    Button(action: {
-//                        print("Reminders")
-//                    }) {
-//                        Image(systemName: "bell.badge")
-//                    }
-//                    Spacer()
-//                }
-//            }
             Popup(title: "Add a New Todo List", placeholder: "New Todo List", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
         }
     }

@@ -49,4 +49,15 @@ struct PersistenceController {
         context.delete(object)
         save(completion: completion)
     }
+    
+    // Delete an array of items from core data memory
+    func deleteMany(_ objects: [NSManagedObject], completion: @escaping (Error?) -> () = {_ in}) {
+        let context = container.viewContext
+        
+        for object in objects {
+            context.delete(object)
+        }
+        
+        save(completion: completion)
+    }
 }

@@ -14,7 +14,7 @@ struct ProductivityCoreApp: App {
     
     var body: some Scene {
         WindowGroup {
-            TodoListsView()
+            TabsView()
                 .environment(\.managedObjectContext, persistanceContainer.container.viewContext)
         }
     }
@@ -24,12 +24,6 @@ enum PopupTypes {
     case open
     case done
     case cancel
-}
-
-enum ViewTypes {
-    case todos
-    case calendar
-    case reminders
 }
 
 struct FirstResponderTextField: UIViewRepresentable {
