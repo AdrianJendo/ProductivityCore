@@ -1,9 +1,3 @@
-.DS_Store
-ProductivityCore.xcodeproj/
-ProductivityCore/GoogleService-Info.plist
-ProductivityCore/Info.plist
-todo.md
-
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -94,3 +88,4 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+todo.md

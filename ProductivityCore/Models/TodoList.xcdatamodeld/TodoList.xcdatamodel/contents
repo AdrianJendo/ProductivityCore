@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20B50" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="GlobalData" representedClassName="GlobalData" syncable="YES">
-        <attribute name="view" optional="YES" attributeType="String"/>
-    </entity>
     <entity name="Item" representedClassName="Item" syncable="YES">
         <attribute name="completed" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -21,7 +18,6 @@
         <relationship name="item" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="origin" inverseEntity="Item"/>
     </entity>
     <elements>
-        <element name="GlobalData" positionX="-54" positionY="45" width="128" height="44"/>
         <element name="Item" positionX="-63" positionY="-18" width="128" height="104"/>
         <element name="TodoList" positionX="-63" positionY="-27" width="128" height="149"/>
     </elements>
