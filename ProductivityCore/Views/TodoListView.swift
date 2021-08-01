@@ -24,7 +24,7 @@ struct TodoListView: View {
             VStack {
                 List {
                     ForEach(list.itemsArray, id:\.self) { item in
-                        if (list.showCompleted && !list.showOnlyCompleted) || //Try simplify with boolean algebra at some point
+                        if (list.showCompleted && !list.showOnlyCompleted) ||
                             (list.showCompleted && item.completed) ||
                             (!list.showCompleted && !item.completed)
                         {
@@ -52,7 +52,6 @@ struct TodoListView: View {
                             }
                         }
                     }
-                    
                     ToolbarItemGroup(placement: .navigationBarTrailing) {
                         if editMode == .transient {
                             Button("Cancel") {
@@ -90,7 +89,6 @@ struct TodoListView: View {
                         }
                         .disabled(editMode != .inactive || addButtonDelay || list.showOnlyCompleted)
                     }
-                    
                     ToolbarItem(placement: .bottomBar) {
                         if numCompleted > 0 {
                             ZStack {
@@ -108,16 +106,17 @@ struct TodoListView: View {
                                 Spacer()
                                 if list.showCompleted {
                                     Button(action: {
-//                                    withAnimation {
-                                        list.showCompletedFooter.toggle()
-                                        PersistenceController.shared.save()
-//                                    }
+                                        withAnimation { // Doesn't work ???
+                                            list.showCompletedFooter.toggle()
+                                            PersistenceController.shared.save()
+                                        }
                                     }) {
                                         Image(systemName: "arrow.up.circle")
                                             .resizable()
                                             .frame(width: 25, height: 25)
                                     }
-                                    .rotationEffect(withAnimation(.easeInOut){Angle.degrees(list.showCompletedFooter ? 180 : 0)})
+                                    .rotationEffect(Angle.degrees(list.showCompletedFooter ? 180 : 0))
+                                    .animation(Animation.easeInOut)
                                     .offset(x: 160)
                                     .disabled(deleteCompletedPopup)
                                 }
@@ -159,8 +158,6 @@ struct TodoListView: View {
                             }
                         }) {
                             Image(systemName: "xmark.bin")
-                                .resizable()
-                                .frame(width: 25, height: 25)
                         }
                         .frame(maxWidth: .infinity)
                         Divider()
@@ -180,12 +177,10 @@ struct TodoListView: View {
                             resetToIncomplete()
                         }) {
                             Image(systemName: "arrow.clockwise")
-                                .resizable()
-                                .frame(width: 25, height: 25)
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 5)
                     .padding(.bottom, 10)
                 }
             }
@@ -241,9 +236,7 @@ struct TodoListView: View {
         PersistenceController.shared.save()
     }
 
-    // Sets the value of highlight index on view load
-    // Currently sets index to last empty index, but considering changing to just last index if its empty
-    // Also does necessary initializations
+    // Does necessary initializations for state
     private func initializeList() {
         self.popupTitle = self.list.wrappedTitle
         let itemsArray = self.list.itemsArray
@@ -255,7 +248,7 @@ struct TodoListView: View {
         // Set highlight index to first element if its the only element and blank
 //        if let lastEmptyIndex = itemsArray.lastIndex(where: { $0.text == ""}) {
 //            if lastEmptyIndex == 0 {
-//                DispatchQueue.main.async {
+//                DispatchQueue.main.async { // DispatchQueue.main.asyncAfter(deadline: .now() + 0.5)
 //                    self.highlightIndex = lastEmptyIndex
 //                }
 //            }
@@ -281,15 +274,13 @@ struct TodoListView: View {
     
     private func resetToIncomplete() {
         let filtered = self.list.itemsArray.filter({ $0.completed })
-
         self.numCompleted = 0
         self.list.showOnlyCompleted = false
-        
-
         for item in filtered {
             _ = Item(context: viewContext, originalItem: item)
-            PersistenceController.shared.delete(item)
+//            PersistenceController.shared.delete(item)
         }
+        PersistenceController.shared.deleteMany(filtered)
     }
 
     // Helper function just to make sure the order doesn't get messed up (not used in prod)
@@ -300,13 +291,5 @@ struct TodoListView: View {
             cur += 1
         }
         print("Check Completed Successfully")
-    }
-}
-
-extension String {
-   func widthOfString(usingFont font: UIFont) -> CGFloat {
-        let fontAttributes = [NSAttributedString.Key.font: font]
-        let size = self.size(withAttributes: fontAttributes)
-        return size.width
     }
 }

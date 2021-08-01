@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUIX
 
 struct Popup: View {
     var title: String
@@ -26,7 +25,7 @@ struct Popup: View {
                     Text(title)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .font(Font.system(size: 16, weight: .semibold))
-                    .padding()
+                        .padding()
                     
                     Divider()
 
@@ -64,7 +63,6 @@ struct Popup: View {
                         Spacer()
                     }
                     .padding()
-                    
                 }
                 .background(Color.secondarySystemBackground)
                 .cornerRadius(10)

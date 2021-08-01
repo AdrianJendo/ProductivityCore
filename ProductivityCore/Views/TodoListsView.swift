@@ -12,74 +12,69 @@ struct TodoListsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: TodoList.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \TodoList.order, ascending: true)])
     private var todoLists: FetchedResults<TodoList>
-    @State private var highlightIndex = -1 // Highlighted index when updating a field
     @State private var editMode: EditMode = .inactive // Current state of EditMode used to handle editing
     @State private var popupTitle = "" // Binding for when editing todolist title
     @State private var popupType: PopupTypes = .cancel // Status of popup
     @State private var showPopup = false // Boolean needed to check on change of previous variable
     
-
     var body: some View {
         ZStack {
-                NavigationView {
-                    List {
-                        ForEach(todoLists, id:\.self) { list in
-                            NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
-                                .height(40)
-                        }
-                        .onDelete(perform: deleteTodoList)
-                        .onMove(perform: moveTodoList)
+            NavigationView {
+                List {
+                    ForEach(todoLists, id:\.self) { list in
+                        NavigationLink(list.wrappedTitle, destination: TodoListView(list: list))
+                            .height(40)
                     }
-                    .navigationTitle("Todo Lists")
-                    .overlay(Text("Add A New Todo List")
-                                .font(.system(size: 32, weight: .thin))
-                                .opacity(todoLists.count > 0 ? 0 : 1)
-                    )
-                    .environment(\.editMode, $editMode)
-                    .onChange(of: showPopup, perform: { value in
-                        if popupType == .done {
-                            if(popupTitle == ""){
-                                popupTitle = "New Item"
-                            }
-                            addTodoList(popupTitle)
+                    .onDelete(perform: deleteTodoList)
+                    .onMove(perform: moveTodoList)
+                }
+                .navigationTitle("Todo Lists")
+                .overlay(Text("Add A New Todo List")
+                            .font(.system(size: 32, weight: .thin))
+                            .opacity(todoLists.count > 0 ? 0 : 1)
+                )
+                .environment(\.editMode, $editMode)
+                .onChange(of: showPopup, perform: { value in
+                    if popupType == .done {
+                        if(popupTitle == ""){
+                            popupTitle = "New Item"
                         }
-                        
-                        popupTitle = ""
-                    })
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            if(editMode == .transient) {
-                                Button("Cancel") {
-                                    editMode = .inactive
-                                }
+                        addTodoList(popupTitle)
+                    }
+                    popupTitle = ""
+                })
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        if(editMode == .transient) {
+                            Button("Cancel") {
+                                editMode = .inactive
                             }
-                            else {
-                                Button(action: {
-                                    withAnimation {
-                                        editMode.toggle()
-                                    }
-                                }) {
-                                    Text(editMode == .active ? "Done" : "Edit")
-                                }
-                            }
-                            
+                        }
+                        else {
                             Button(action: {
-                                popupType = .open
-                                showPopup = true
+                                withAnimation {
+                                    editMode.toggle()
+                                }
                             }) {
-                                Image(systemName: "plus.circle")
+                                Text(editMode == .active ? "Done" : "Edit")
                             }
-                            .disabled(editMode == .active || editMode == .transient)
                         }
-                        
-                        ToolbarItem(placement: .bottomBar) {
-                            Text("")
-                                .height(55)
-                                .width(500)
-                                .backgroundFill(Color.systemBackground)
+                        Button(action: {
+                            popupType = .open
+                            showPopup = true
+                        }) {
+                            Image(systemName: "plus.circle")
                         }
+                        .disabled(editMode == .active || editMode == .transient)
                     }
-                }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors
+                    ToolbarItem(placement: .bottomBar) {
+                        Text("")
+                            .height(55)
+                            .width(500)
+                            .backgroundFill(Color.systemBackground)
+                    }
+                }
+            }.navigationViewStyle(StackNavigationViewStyle()) //Idk what it does but Removing this adds some errors I think
             Popup(title: "Add a New Todo List", placeholder: "New Todo List", show: $showPopup, popupStatus: $popupType, text: $popupTitle)
         }
     }
@@ -106,24 +101,14 @@ struct TodoListsView: View {
         }
     }
 
-    // Update todo list name
-    private func updateTodoList(_ todoList: FetchedResults<TodoList>.Element, _ text: String) {
-        self.highlightIndex = todoLists.firstIndex{ $0 == todoList } ?? -1
-        withAnimation {
-            todoList.title = text
-            PersistenceController.shared.save()
-        }
-    }
-
     // Change todo order
     private func moveTodoList(source: IndexSet, destination: Int) {
-        var newTodoOrder: [TodoList] = todoLists.map{$0}
+        var newTodoOrder: [TodoList] = todoLists.map{$0} // Shallow copy or something
         newTodoOrder.move(fromOffsets: source, toOffset: destination)
-
+        // Traverse entire list and reindex everything based on new order
         for index in newTodoOrder.indices {
             newTodoOrder[index].order = Int64(index)
         }
-
         PersistenceController.shared.save()
     }
 }

@@ -10,15 +10,13 @@ import SwiftUIX
 
 struct TodoListRowView: View {
     @State var list: TodoList //Full list
-    @State var item: Item //List item
+    @State var item: Item // List item
     @State var completed: Bool
     @Binding var numCompleted: Int
     @Binding var showCompleted: Bool
     @Binding var editMode: EditMode
     @Binding var highlightIndex: Int
     @State private var animationDone = false
-    @State private var isEditing = false
-    
     
     var body: some View {
         HStack {
@@ -38,6 +36,7 @@ struct TodoListRowView: View {
                 .onTapGesture {
                     completed.toggle()
                     animationDone = false
+                    highlightIndex = -1
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         withAnimation {
                             animationDone = true
@@ -54,10 +53,13 @@ struct TodoListRowView: View {
                 }
                 .disabled(editMode != .inactive)
                 
+                // We can probably replace this with FirstResponderTextField at some point to avoid reliance on third parties
+                // Something like: if (list.itemsArray.firstIndex{ $0 == item } == highlightIndex) FirstResponderTextField else TextField
                 CocoaTextField("Todo Task", text: Binding<String>(get: {item.text ?? ""}, set: {updateTodoItem(item, $0)}), onCommit: {
                     highlightIndex = -1
                  })
-                    .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
+//                    .isFirstResponder(list.itemsArray.firstIndex{ $0 == item } == highlightIndex)
+                    .isFirstResponder(Int(item.order) == highlightIndex)
                     .height(40)
                     .disableAutocorrection(true)
                     .disabled(editMode == .active || editMode == .transient)
@@ -67,13 +69,13 @@ struct TodoListRowView: View {
     
     // Change text of item
     private func updateTodoItem(_ item: FetchedResults<Item>.Element, _ text: String) {
-        //        if let items = self.list.item?.allObjects as? [Item] {
-        self.highlightIndex = self.list.itemsArray.firstIndex{ $0 == item } ?? -1
+//        if let items = self.list.item?.allObjects as? [Item] {
+        self.highlightIndex = Int(item.order) // self.list.itemsArray.firstIndex{ $0 == item }
         withAnimation {
             item.text = text
             PersistenceController.shared.save()
         }
-        //        }
+//        }
     }
 }
 
